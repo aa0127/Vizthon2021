@@ -1,0 +1,50 @@
+# IMPORTS
+import warnings
+warnings.filterwarnings('ignore')
+import pycountry
+import numpy as np
+import pandas as pd
+import plotly
+import dplython
+import plotly.express as px
+import plotly.graph_objects as go
+import plotly.io as pio
+
+
+#read the csv file
+df = pd.read_csv (r'C:\Users\Meena Krishnan\Downloads\human_development.csv')   
+
+#converting country names to 3 letter iso-alpha codes
+def alpha3code(column):
+    CODE=[]
+    for country in column:
+        try:
+            code=pycountry.countries.get(name=country).alpha_3
+          
+            CODE.append(code)
+        except:
+            CODE.append('None')
+    return CODE
+# create a column for CODE
+df['CODE']=alpha3code(df.Country)
+
+# selecting column names from data frame
+df = pd.DataFrame(df, columns = ['Life Expectancy at Birth', 'Country', 'Mean Years of Education', 'CODE'])
+
+# renaming CODE to 3 letter code
+df = df.rename(columns={"CODE":"3 Letter Code"})
+
+# creating map
+map_fig = px.scatter_geo(df, 
+                     locations="3 Letter Code",
+                     color = "Life Expectancy at Birth",
+                     size = "Mean Years of Education",
+                     hover_name="Country",
+                    template = "simple_white"
+                    )
+map_fig.update_layout(
+        title = 'Mean Years of Education and Life Expectancy of Countries<br>(Hover for names and detail)',
+        geo = go.layout.Geo(landcolor = "rgb(217, 217, 217)",
+                            scope = "world",
+                            coastlinecolor = "rgb(117, 125, 119)"))
+map_fig.show()
