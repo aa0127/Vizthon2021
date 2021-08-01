@@ -1,0 +1,32 @@
+# making a huggggeee data frame
+df4 = pd.read_csv (r'C:\Users\Meena Krishnan\Downloads\world-happiness-report (1).csv') 
+df5 = pd.read_csv (r'C:\Users\Meena Krishnan\Downloads\world-happiness-report-2021.csv')
+df4 = pd.DataFrame(df4, columns = ['Country name', 'year', 'Social support'])
+df5 = pd.DataFrame(df5, columns = ['Country name', 'Regional indicator', 'Healthy life expectancy'])
+best_df = pd.merge(df4, df5, on ='Country name', how ='inner')
+
+# getting rid of the countries, by combining their values into the region's mean
+best_df = pd.DataFrame(best_df, columns = ['Regional indicator', 'Healthy life expectancy', 'Social support'])
+best_df = best_df.rename(columns={"Regional indicator":"region", "Healthy life expectancy":"life", "Social support":"soc_sup"})
+best_df2 = best_df.groupby(['region'])['life'].mean()
+better_df = best_df.groupby(['region'])['soc_sup'].mean()
+best_df2 = best_df2.to_frame()
+better_df = better_df.to_frame()
+
+# creating the final data frame from scratch using the values
+d = {'region': ['Central and Eastern Europe', 'Commonwealth of Independent States', 
+                'East Asia', 'Latin America and Caribbean', 'Middle East and North Africa', 
+                'North America and ANZ', 'South Asia', 'Southeast Asia', 'Sub-Saharan Africa', 
+                'Western Europe'], 'soc_sup': [0.854453, 0.828559, 0.849841, 0.850566, 0.789551, 
+                                               0.939107, 0.654048, 0.809035, 0.714482, 0.917092], 'life': [68.306702, 65.059947, 71.234329, 67.209670, 65.779057,
+                                                                                                          72.279310, 61.643881, 65.214121, 56.031585, 73.005705]}
+cool_df = pd.DataFrame(data=d)
+
+# the bar graph
+bar_fig = px.bar(cool_df, x="region", y="life",
+             color='soc_sup', barmode='group',
+             height=500, template="simple_white", labels={'life':'Life Expectancy', 'soc_sup':'Social Support Index', 'region':'Region'})
+bar_fig.update_traces(marker_line_color='rgb(0,0,0)', opacity=0.7)
+bar_fig.update_layout(title_text='Average Life Expectancy and Social Support in Various World Regions', 
+                  barmode='stack', xaxis={'categoryorder':'total descending'})
+bar_fig.show()
