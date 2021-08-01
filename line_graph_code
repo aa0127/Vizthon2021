@@ -1,0 +1,45 @@
+# imports
+import pandas as pd 
+import plotly.express as px
+
+#getting/merging the data
+df2 = pd.read_csv (r'C:\Users\Meena Krishnan\Downloads\world-happiness-report (1).csv') 
+df3 = pd.read_csv (r'C:\Users\Meena Krishnan\Downloads\world-happiness-report-2021.csv')
+df2 = pd.DataFrame(df2, columns = ['Country name', 'year', 'Freedom to make life choices'])
+df3 = pd.DataFrame(df3, columns = ['Country name', 'Regional indicator'])
+merged_df = pd.merge(df2, df3, on ='Country name', how ='inner')
+merged_df = pd.DataFrame(merged_df, columns = ['Regional indicator', 'year', 'Freedom to make life choices', 'Country name'])
+
+#renaming columns
+merged_df = merged_df.rename(columns={"Freedom to make life choices":"life_choice", "Regional indicator":"region", "Country name":"country"})
+
+#making seperate data frames based on years
+df_2006 = merged_df[merged_df.year == 2006]
+df_2008 = merged_df[merged_df.year == 2008]
+df_2010 = merged_df[merged_df.year == 2010]
+df_2012 = merged_df[merged_df.year == 2012]
+df_2014 = merged_df[merged_df.year == 2014]
+df_2016 = merged_df[merged_df.year == 2016]
+df_2018 = merged_df[merged_df.year == 2018]
+df_2020 = merged_df[merged_df.year == 2020]
+
+#getting means of countries for each year
+series_2006 = df_2006.groupby(['region'])['life_choice'].mean()
+series_2008 = df_2008.groupby(['region'])['life_choice'].mean()
+series_2010 = df_2010.groupby(['region'])['life_choice'].mean()
+series_2012 = df_2012.groupby(['region'])['life_choice'].mean()
+series_2014 = df_2014.groupby(['region'])['life_choice'].mean()
+series_2016 = df_2016.groupby(['region'])['life_choice'].mean()
+series_2018 = df_2018.groupby(['region'])['life_choice'].mean()
+series_2020 = df_2020.groupby(['region'])['life_choice'].mean()
+
+#creating mega data frame
+megadf = pd.DataFrame({'2006': series_2006, '2008': series_2008, 
+              '2010': series_2010, '2012': series_2012, 
+              '2014': series_2014, '2016': series_2016, 
+              '2018': series_2018, '2020': series_2020})
+
+#creating graph 
+line_fig = megadf.T.plot(title="Freedom to make Life Choices in 10 World Regions from 2006-2020",
+              labels=dict(index="Year", value="Freedom to make Life Choices(Index)", variable="Region"))
+line_fig
